@@ -5,15 +5,12 @@
 
 using namespace std;
 
-list<MsgBox *> MsgBox::ls;
-
 MsgBox::MsgBox(int btn, QWidget *parent) :
     QDialog(parent)
 {
     setWindowFlags(Qt::FramelessWindowHint|Qt::Dialog);  //禁用对话框边框及控件
     setAttribute(Qt::WA_TranslucentBackground);  //背景透明
     ui.setupUi(this);
-    ls.push_back(this);
 
     if(btn==1)
     {
@@ -23,17 +20,16 @@ MsgBox::MsgBox(int btn, QWidget *parent) :
     }
     if(btn==2)
     {
-        connect(ui.pushButton_2, &QPushButton::clicked, [&]{access=true; close();});
-        connect(ui.pushButton, &QPushButton::clicked, [&]{access=false; close();});
+        connect(ui.pushButton_2, &QPushButton::clicked, this, &QDialog::accept);
+        connect(ui.pushButton, &QPushButton::clicked, this, &QDialog::reject);
     }
 }
 
 MsgBox::~MsgBox()
 {
-    ls.pop_back();
 }
 
-void MsgBox::setMsg(const QString &msg, msgType type)
+void MsgBox::setMsg(const QString &msg, Type type)
 {
     if(type==alert)
         ui.label_2->setText("！警告");
@@ -42,33 +38,19 @@ void MsgBox::setMsg(const QString &msg, msgType type)
     ui.label->setText(msg);
 }
 
-MsgBox *MsgBox::act()
+void MsgBox::throwBox(const QString &msg, Type type)
 {
-    if(ls.empty())
-        return nullptr;
-    return ls.back();
+    MsgBox box(1, QApplication::activeWindow());
+    box.setMsg(msg, type);
+    box.exec();
 }
 
-void MsgBox::throwBox1(const QString &msg, msgType type)
+bool MsgBox::catchBox(const QString &msg, Type type)
 {
-    MsgBox *box=new MsgBox(1, QApplication::activeWindow());
-    box->setMsg(msg, type);
-    box->show();
-}
-
-void MsgBox::throwBox2(const QString &msg, msgType type)
-{
-    MsgBox *box=new MsgBox(2, QApplication::activeWindow());
-    box->setMsg(msg, type);
-    box->show();
-}
-
-bool MsgBox::catchBox()
-{
-    if(MsgBox::act()==nullptr)
+    MsgBox box(2, QApplication::activeWindow());
+    box.setMsg(msg, type);
+    if(box.exec()==QDialog::Accepted)
+        return true;
+    else
         return false;
-    MsgBox::act()->exec();
-    bool ret=MsgBox::act()->access;
-    delete MsgBox::act();
-    return ret;
 }

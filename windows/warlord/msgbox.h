@@ -12,23 +12,19 @@ class MsgBox : public QDialog
     Q_OBJECT
 
 public:
-    enum msgType
+    enum Type
     {
         info,
         alert
     };
-    static void throwBox1(const QString &msg, msgType type = info);
-    static void throwBox2(const QString &msg, msgType type = info);
-    static bool catchBox();
+    static void throwBox(const QString &msg, Type type = info);
+    static bool catchBox(const QString &msg, Type type = info);
+
 private:
     explicit MsgBox(int btn, QWidget *parent = nullptr);
     ~MsgBox();
     Ui::MsgBox ui;
-    void setMsg(const QString &msg, msgType type);
-    bool access;
-
-    static list<MsgBox *> ls;
-    static MsgBox *act();
+    void setMsg(const QString &msg, Type type);
 };
 
 #endif // MSGBOX_H

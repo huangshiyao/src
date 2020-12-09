@@ -14,7 +14,7 @@ MainGui::MainGui(QWidget *parent)
     foreach_widget_get(this);
     resize(800, 600);
     show();
-    connect(ui.pushButton, &QPushButton::clicked, [&]{MsgBox::throwBox2("确定关闭？"); if(MsgBox::catchBox()) close();});
+    connect(ui.pushButton, &QPushButton::clicked, [&]{if(MsgBox::catchBox("确定关闭？")) close();});
 }
 
 MainGui::~MainGui()
